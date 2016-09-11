@@ -30,9 +30,11 @@ import android.widget.NumberPicker;
 import android.widget.Spinner;
 
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
-import com.github.rubensousa.bottomsheetbuilder.BottomSheetView;
-import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetEditor;
 import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
+import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetView;
+import com.github.rubensousa.bottomsheetbuilder.menu.BottomSheetMenu;
+import com.github.rubensousa.bottomsheetbuilder.menu.BottomSheetMenuAdapter;
+import com.github.rubensousa.bottomsheetbuilder.menu.BottomSheetMenuItem;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,7 +44,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnItemSelectedListener, BottomSheetViewHolder,BottomSheetItemClickListener{
+public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnItemSelectedListener,BottomSheetViewHolder, BottomSheetItemClickListener{
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -61,6 +63,7 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
     private BottomSheetView mBottomSheet;
     private Menu mMenu;
     private SettingsSectionAdapter mAdapter;
+    int mCount=250;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,18 +147,46 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
                 .setMenu(mMenu)
                 .setMode(mode)
                 .setBackgroundColor(android.R.color.white)
-                .setEditorEnabled(true)
-                .setItemClickListener((BottomSheetItemClickListener) RuntimeEditing.this)
+                .setEditorEnabled(new BottomSheetMenuAdapter() {
+                    @Override
+                    public int getDrawableRes(MenuItem subMenuItem) {
+                        switch (subMenuItem.getItemId()) {
+                            case R.id.id_camera_alt:
+                                return R.drawable.ic_camera_alt_24dp;
+                            case R.id.id_cloud:
+                                return R.drawable.ic_cloud_upload_24dp;
+                            case R.id.id_copy:
+                                return R.drawable.ic_content_copy_24dp;
+                            case R.id.id_document:
+                                return R.drawable.ic_document;
+                            case R.id.id_folder:
+                                return R.drawable.ic_folder_24dp;
+                            case R.id.id_gmail:
+                                return R.drawable.ic_gmail_48dp;
+                            case R.id.id_google:
+                                return R.drawable.ic_google;
+                            case R.id.id_hangouts:
+                                return R.drawable.ic_hangouts;
+                            case R.id.id_mail:
+                                return R.drawable.ic_mail_48dp;
+                            case R.id.id_message:
+                                return R.drawable.ic_message_48dp;
+                            case R.id.id_spreadsheet:
+                                return R.drawable.ic_spreadsheet;
+                            case R.id.id_twitter:
+                                return R.drawable.ic_twitter_box;
+                            case R.id.id_facebook:
+                                return R.drawable.ic_facebook_box;
+                        }
+                        return 0;
+                    }
+                })
+                .setItemClickListener(this)
                 .createView();
         mBottomSheet.getBehavior().setSkipCollapsed(true);
         mBottomSheet.getBehavior().setHideable(true);
         mBottomSheet.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
-        mBottomSheet.getEditor().setComparator(new Comparator<MenuItem>() {
-            @Override
-            public int compare(MenuItem menuItem, MenuItem t1) {
-                return menuItem.getTitle().toString().compareTo(t1.getTitle().toString())==0?0:-1;
-            }
-        });
+        mBottomSheet.setRecyclerHasFixedSize(true);
     }
 
     @Override
@@ -170,13 +201,23 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
-    public BottomSheetEditor getEditor() {
-        return mBottomSheet==null?null:mBottomSheet.getEditor();
+    public void onBottomSheetItemClick(int menuId) {
+        mAdapter.onMenuItemClick(getMenu().findItemByID(menuId));
     }
 
     @Override
-    public void onBottomSheetItemClick(MenuItem item) {
-        mAdapter.onMenuItemClick(item);
+    public BottomSheetMenu getMenu() {
+        return mBottomSheet.getEditableMenu();
+    }
+
+    @Override
+    public int getId() {
+        return mCount++;
+    }
+
+    @Override
+    public int getUniqueId() {
+        return getId();
     }
 
     /**
@@ -215,11 +256,24 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
 
         @OnClick(R.id.button_add_menu)
         public void onMenuAddBtnClick() {
-            Menu menu=new MenuBuilder(getContext());
-            MenuItem item=menu.add(Menu.NONE,(int)(Math.random()*Integer.MAX_VALUE),Menu.NONE,mAddTitle.getText())
-            .setIcon(ResourcesCompat.getDrawable(getResources(), android.R.drawable.ic_menu_add, null));
             try {
-                mHolder.getEditor().addItem(item, mPicker.getValue());
+                mHolder.getMenu().insertMenuItem(mPicker.getValue(),
+                        new BottomSheetMenuItem(mHolder.getId(),mAddTitle.getText().toString(),true,android.R.drawable.ic_menu_add));
+            }
+            catch (Exception e) {
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Wrong input")
+                        .setMessage(e.getMessage())
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        }
+
+        @OnClick(R.id.button_add_submenu_item)
+        public void onMenuAddSubItemClick() {
+            try {
+                mHolder.getMenu().addMenuItemToSubmenu(mPicker.getValue(),
+                        new BottomSheetMenuItem(mHolder.getId(),mAddTitle.getText().toString(),true,android.R.drawable.ic_menu_add));
             }
             catch (Exception e) {
                 new AlertDialog.Builder(getContext())
@@ -235,7 +289,9 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
             Menu menu=new MenuBuilder(getContext());
             menu.addSubMenu(Menu.NONE,(int)(Math.random()*Integer.MAX_VALUE),Menu.NONE,mAddTitle.getText());
             try {
-                mHolder.getEditor().addItem(menu.getItem(0));
+                BottomSheetMenu subMenu=new BottomSheetMenu(mHolder.getId(),"Default submenu title");
+                subMenu.addMenuItem(new BottomSheetMenuItem(mHolder.getId(),mAddTitle.getText().toString(),true,android.R.drawable.ic_menu_add));
+                mHolder.getMenu().insertMenuItem(mPicker.getValue(),subMenu);
             }
             catch (Exception e) {
                 new AlertDialog.Builder(getContext())
@@ -251,6 +307,7 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
      * A placeholder fragment containing a simple view.
      */
     public static class ChangePlaceholderFragment extends Fragment {
+
         public ChangePlaceholderFragment() {
         }
 
@@ -287,10 +344,12 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
 
         @OnClick(R.id.button_change)
         public void onChangeBtnClick() {
-            Menu menu=new MenuBuilder(getContext());
-            MenuItem item=menu.add(Menu.NONE,(int)(Math.random()*Integer.MAX_VALUE),Menu.NONE,mFrom.getText());
             try {
-                mHolder.getEditor().changeItem(item, mTo.getText().toString());
+                BottomSheetMenuItem oldItem=mHolder.getMenu().findItemByTitle(mFrom.getText().toString());
+                BottomSheetMenuItem newItem=oldItem.clone(mHolder);
+                newItem.setTitle(mTo.getText().toString());
+
+                mHolder.getMenu().changeMenuItem(oldItem.getItemId(), newItem);
             }
             catch (Exception e) {
                 new AlertDialog.Builder(getContext())
@@ -301,7 +360,7 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
             }
         }
 
-        void onMenuItemClick(MenuItem item) {
+        void onMenuItemClick(BottomSheetMenuItem item) {
             if(mFrom!=null) mFrom.setText(item.getTitle());
         }
     }
@@ -345,10 +404,8 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
 
         @OnClick(R.id.button_delete)
         public void onDeleteBtnClick() {
-            Menu menu=new MenuBuilder(getContext());
-            MenuItem item=menu.add(mDeleteTitle.getText());
             try {
-                mHolder.getEditor().removeItem(item);
+                mHolder.getMenu().removeMenuItem(mHolder.getMenu().findItemByTitle(mDeleteTitle.getText().toString()).getItemId());
             }
             catch (Exception e) {
                 new AlertDialog.Builder(getContext())
@@ -359,7 +416,7 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
             }
         }
 
-        void onMenuItemClick(MenuItem item) {
+        void onMenuItemClick(BottomSheetMenuItem item) {
             if (mDeleteTitle!=null) mDeleteTitle.setText(item.getTitle());
         }
     }
@@ -411,7 +468,7 @@ public class RuntimeEditing extends AppCompatActivity implements AdapterView.OnI
             return null;
         }
 
-        void onMenuItemClick(MenuItem item) {
+        void onMenuItemClick(BottomSheetMenuItem item) {
             mDelete.onMenuItemClick(item);
             mChange.onMenuItemClick(item);
         }

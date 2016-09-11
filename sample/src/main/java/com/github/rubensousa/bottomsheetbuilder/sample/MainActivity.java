@@ -140,8 +140,8 @@ public class MainActivity extends AppCompatActivity implements BottomSheetItemCl
                 .expandOnStart(true)
                 .setItemClickListener(new BottomSheetItemClickListener() {
                     @Override
-                    public void onBottomSheetItemClick(MenuItem item) {
-                        Log.d("Item click", item.getTitle() + "");
+                    public void onBottomSheetItemClick(int id) {
+                        Log.d("Item click", getResources().getResourceName(id) + "");
                         mShowingSimpleDialog = false;
                     }
                 })
@@ -170,8 +170,8 @@ public class MainActivity extends AppCompatActivity implements BottomSheetItemCl
                 .expandOnStart(true)
                 .setItemClickListener(new BottomSheetItemClickListener() {
                     @Override
-                    public void onBottomSheetItemClick(MenuItem item) {
-                        Log.d("Item click", item.getTitle() + "");
+                    public void onBottomSheetItemClick(int id) {
+                        Log.d("Item click", getResources().getResourceName(id) + "");
                         mShowingHeaderDialog = false;
                     }
                 })
@@ -200,8 +200,8 @@ public class MainActivity extends AppCompatActivity implements BottomSheetItemCl
                 .expandOnStart(true)
                 .setItemClickListener(new BottomSheetItemClickListener() {
                     @Override
-                    public void onBottomSheetItemClick(MenuItem item) {
-                        Log.d("Item click", item.getTitle() + "");
+                    public void onBottomSheetItemClick(int id) {
+                        Log.d("Item click", getResources().getResourceName(id) + "");
                         mShowingGridDialog = false;
                     }
                 })
@@ -229,8 +229,8 @@ public class MainActivity extends AppCompatActivity implements BottomSheetItemCl
                 .setMenu(R.menu.menu_bottom_list_sheet)
                 .setItemClickListener(new BottomSheetItemClickListener() {
                     @Override
-                    public void onBottomSheetItemClick(MenuItem item) {
-                        Log.d("Item click", item.getTitle() + "");
+                    public void onBottomSheetItemClick(int id) {
+                        Log.d("Item click", getResources().getResourceName(id) + "");
                         mShowingLongDialog = false;
                     }
                 })
@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements BottomSheetItemCl
     }
 
     @Override
-    public void onBottomSheetItemClick(MenuItem item) {
+    public void onBottomSheetItemClick(int id) {
         mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 }

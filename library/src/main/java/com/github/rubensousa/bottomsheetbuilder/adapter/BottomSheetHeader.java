@@ -22,17 +22,16 @@ class BottomSheetHeader implements BottomSheetItem {
 
     private String mTitle;
 
-    @ColorInt
-    private int mTextColor;
+    private BottomSheetColors mColors;
 
-    public BottomSheetHeader(String title, @ColorInt int color) {
+    public BottomSheetHeader(String title, BottomSheetColors colors) {
         mTitle = title;
-        mTextColor = color;
+        mColors= colors;
     }
 
     @ColorInt
     public int getTextColor() {
-        return mTextColor;
+        return mColors.getHeaderTextColor();
     }
 
     @Override

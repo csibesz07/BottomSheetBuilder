@@ -16,17 +16,14 @@
 
 package com.github.rubensousa.bottomsheetbuilder.adapter;
 
-import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
@@ -65,7 +62,7 @@ class BottomSheetItemAdapter extends RecyclerView.Adapter<BottomSheetItemAdapter
     public int getItemViewType(int position) {
         BottomSheetItem item = mItems.get(position);
 
-        if (item instanceof BottomSheetMenuItem) {
+        if (item instanceof BottomSheetListMenuItem) {
             return TYPE_ITEM;
         } else if (item instanceof BottomSheetDivider) {
             return TYPE_DIVIDER;
@@ -117,14 +114,14 @@ class BottomSheetItemAdapter extends RecyclerView.Adapter<BottomSheetItemAdapter
 
         if (mMode == BottomSheetBuilder.MODE_LIST) {
             if (holder.getItemViewType() == TYPE_ITEM) {
-                ((ItemViewHolder) holder).setData((BottomSheetMenuItem) item);
+                ((ItemViewHolder) holder).setData((BottomSheetListMenuItem) item);
             } else if (holder.getItemViewType() == TYPE_HEADER) {
                 ((HeaderViewHolder) holder).setData((BottomSheetHeader) item);
             } else if (holder.getItemViewType() == TYPE_DIVIDER) {
                 ((DividerViewHolder) holder).setData((BottomSheetDivider) item);
             }
         } else {
-            ((ItemViewHolder) holder).setData((BottomSheetMenuItem) item);
+            ((ItemViewHolder) holder).setData((BottomSheetListMenuItem) item);
         }
     }
 
@@ -151,14 +148,21 @@ class BottomSheetItemAdapter extends RecyclerView.Adapter<BottomSheetItemAdapter
         }
 
         public void setData(BottomSheetDivider item) {
-            Drawable background = item.getBackground();
-            if (background != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    divider.setBackground(background);
-                }
-                else {
-                    //noinspection deprecation
-                    divider.setBackgroundDrawable(background);
+
+            if (item.hasBackgroundRes())
+                divider.setBackgroundResource(item.getBackgroundRes());
+            else {
+                Drawable background = item.getBackground(divider.getContext());
+                if (background != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        divider.setBackground(background);
+                    } else
+                        //noinspection deprecation
+                        divider.setBackgroundDrawable(background);
+
+                    // cannot set background color yet of divider
+                    //} else
+                    //    mRecyclerView.setBackgroundColor(mColors.getBackgroundColor());
                 }
             }
         }
@@ -178,7 +182,7 @@ class BottomSheetItemAdapter extends RecyclerView.Adapter<BottomSheetItemAdapter
             int color = item.getTextColor();
 
             if (color != 0) {
-                textView.setTextColor(color);
+                textView.setTextColor(item.getTextColor());
             }
         }
     }
@@ -196,33 +200,40 @@ class BottomSheetItemAdapter extends RecyclerView.Adapter<BottomSheetItemAdapter
             textView = (TextView) itemView.findViewById(R.id.textView);
         }
 
-        public void setData(BottomSheetMenuItem item) {
+        public void setData(BottomSheetListMenuItem item) {
             imageView.setImageDrawable(item.getIcon());
             textView.setText(item.getTitle());
-            int color = item.getTextColor();
-            Drawable background = item.getBackground();
 
-            if (color != 0) {
-                textView.setTextColor(color);
+            if (item.getTextColor() != 0) {
+                textView.setTextColor(item.getTextColor());
             }
 
-            if (background != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    itemView.setBackground(background);
+            ///////////////////ITEM VIEW////////////////////
+            if (item.hasBackgroundRes())
+                itemView.setBackgroundResource(item.getBackgroundRes());
+            else {
+                Drawable background = item.getBackground(itemView.getContext());
+                if (background != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        itemView.setBackground(background);
+                    } else
+                        //noinspection deprecation
+                        itemView.setBackgroundDrawable(background);
+
+                    // cannot set background color yet of item
+                    //} else
+                    //    mRecyclerView.setBackgroundColor(mColors.getBackgroundColor());
                 }
-                else
-                    //noinspection deprecation
-                    itemView.setBackgroundDrawable(background);
             }
 
         }
 
         @Override
         public void onClick(View v) {
-            BottomSheetMenuItem item = (BottomSheetMenuItem) mItems.get(getLayoutPosition());
+            BottomSheetListMenuItem item = (BottomSheetListMenuItem) mItems.get(getLayoutPosition());
 
             if (mListener != null) {
-                mListener.onBottomSheetItemClick(item.getMenuItem());
+                mListener.onBottomSheetItemClick(item.getId());
             }
         }
     }

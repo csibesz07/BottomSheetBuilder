@@ -17,21 +17,36 @@
 package com.github.rubensousa.bottomsheetbuilder.adapter;
 
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.annotation.DrawableRes;
 
 
 class BottomSheetDivider implements BottomSheetItem {
 
-    private Drawable mBackgroundDrawable;
+    private BottomSheetColors mColors;
 
-    public BottomSheetDivider(Drawable background) {
-        mBackgroundDrawable = background;
+    public BottomSheetDivider(BottomSheetColors colors) {
+        mColors = colors;
     }
 
-    public Drawable getBackground() {
-        return mBackgroundDrawable;
+    public Drawable getBackground(Context context) {
+        return mColors.getBackground(context);
     }
+
+    @DrawableRes
+    public int getBackgroundRes() { return mColors.getDividerBackgroundRes();}
+
+    public boolean hasBackgroundRes() {
+        return mColors.hasDividerBackgroundRes();
+    }
+
+    Uri getBackgroundUri() {
+        return mColors.getDividerBackgroundUri();
+    }
+
+    public boolean hasBackgroundUri() { return mColors.hasDividerBackgroundUri();}
 
     @Override
     public String getTitle() {

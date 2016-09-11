@@ -146,7 +146,7 @@ public class BottomSheetMenuDialog extends BottomSheetDialog implements BottomSh
     }
 
     @Override
-    public void onBottomSheetItemClick(MenuItem item) {
+    public void onBottomSheetItemClick(int menuId) {
         if (!mClicked) {
 
             if (mBehavior != null) {
@@ -158,7 +158,7 @@ public class BottomSheetMenuDialog extends BottomSheetDialog implements BottomSh
             }
 
             if (mClickListener != null) {
-                mClickListener.onBottomSheetItemClick(item);
+                mClickListener.onBottomSheetItemClick(menuId);
             }
 
             mClicked = true;

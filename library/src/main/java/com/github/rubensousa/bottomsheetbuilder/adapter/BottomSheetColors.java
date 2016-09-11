@@ -4,39 +4,35 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.Serializable;
+import com.github.rubensousa.bottomsheetbuilder.util.BottomSheetBuilderUtils;
 
-public class BottomSheetColors implements Serializable {
-    private transient Context mContext;
-    private transient Drawable mBackgroundDrawable;
+public class BottomSheetColors {
+    private Drawable mBackgroundDrawable;
 
-    private String mBackgroundUri;
+    private Uri mBackgroundUri;
 
     @DrawableRes
     private int mBackgroundRes;
 
-    @ColorInt
-    private int mBackgroundColor;
+    private Drawable mDividerBackgroundDrawable;
 
-    private transient Drawable mDividerBackgroundDrawable;
+    private Drawable mItemBackgroundDrawable;
 
-    private transient Drawable mItemBackgroundDrawable;
+    private Uri mDividerBackgroundUri;
 
-    private String mDividerBackgroundUri;
-
-    private String mItemBackgroundUri;
+    private Uri mItemBackgroundUri;
 
     @DrawableRes
     private int mDividerBackgroundRes;
 
     @DrawableRes
     private int mItemBackgroundRes;
+
+    @ColorInt
+    private int mBackgroundColor;
 
     @ColorInt
     private int mItemTextColor;
@@ -47,24 +43,21 @@ public class BottomSheetColors implements Serializable {
     @ColorInt
     private int mIconTintColor=-1;
 
-    public BottomSheetColors(Context context) {
-        mContext=context;
-    }
 
-    public void setItemTextColorRes(@ColorRes int itemTextColor) {
-        mItemTextColor = ContextCompat.getColor(mContext,itemTextColor);
-    }
+    @ColorInt
+    private int mHeaderTextColor;
 
     public void setItemTextColor(@ColorInt int itemTextColor) {
         mItemTextColor = itemTextColor;
     }
 
-    public void setTitleTextColorRes(@ColorRes int titleTextColor) {
-        mTitleTextColor = ContextCompat.getColor(mContext,titleTextColor);;
-    }
-
     public void setTitleTextColor(@ColorInt int titleTextColor) {
         mTitleTextColor = titleTextColor;
+    }
+
+    // TODO: 9/10/2016 Make header color public
+    void setHeaderText(@ColorInt int color) {
+        mHeaderTextColor = color;
     }
 
     public void setBackground(@DrawableRes int background) {
@@ -72,15 +65,11 @@ public class BottomSheetColors implements Serializable {
     }
 
     public void setBackground(Uri background) {
-        mBackgroundUri=background.toString();
+        mBackgroundUri =background;
     }
 
     public void setBackground(Drawable background) {
         mBackgroundDrawable = background;
-    }
-
-    public void setBackgroundColorRes(@ColorRes int backgroundColor) {
-        mBackgroundColor = ContextCompat.getColor(mContext,backgroundColor);;
     }
 
     public void setBackgroundColor(@ColorInt int backgroundColor) {
@@ -92,7 +81,7 @@ public class BottomSheetColors implements Serializable {
     }
 
     public void setDividerBackground(Uri dividerBackground) {
-        mDividerBackgroundUri = dividerBackground.toString();
+        mDividerBackgroundUri = dividerBackground;
     }
 
     public void setDividerBackground(Drawable dividerBackground) {
@@ -104,67 +93,25 @@ public class BottomSheetColors implements Serializable {
     }
 
     public void setItemBackground(Uri itemBackground) {
-        mItemBackgroundUri = itemBackground.toString();
+        mItemBackgroundUri = itemBackground;
     }
 
     public void setItemBackground(Drawable itemBackground) {
         mItemBackgroundDrawable = itemBackground;
     }
 
-    public void setIconTintColorRes(@ColorRes int iconTintColor) {
-        mIconTintColor = ContextCompat.getColor(mContext,iconTintColor);
-    }
-
     public void setIconTintColor(@ColorInt int iconTintColor) {
         mIconTintColor = iconTintColor;
-    }
-
-
-    public @ColorInt int getBackgroundColor() {
-        return mBackgroundColor;
-    }
-
-    public Drawable getDividerBackground() {
-        if (mDividerBackgroundDrawable!=null)
-            return mDividerBackgroundDrawable;
-        else if (mDividerBackgroundRes!=0)
-            return ContextCompat.getDrawable(mContext,mDividerBackgroundRes);
-        else if (mDividerBackgroundUri!=null)
-            return getDrawableFromUri(mContext,Uri.parse(mDividerBackgroundUri));
-        else
-            return null;
-    }
-
-    public void setContext(Context context) {
-        mContext=context;
-    }
-
-    public Drawable getItemBackground() {
-        if (mItemBackgroundDrawable!=null)
-            return mItemBackgroundDrawable;
-        else if (mItemBackgroundRes!=0)
-            return ContextCompat.getDrawable(mContext,mItemBackgroundRes);
-        else if (mItemBackgroundUri!=null)
-            return getDrawableFromUri(mContext,Uri.parse(mItemBackgroundUri));
-        else
-            return null;
-    }
-
-    public Drawable getBackground() {
-        if (mBackgroundDrawable!=null)
-            return mBackgroundDrawable;
-        else if (mBackgroundRes!=0)
-            return ContextCompat.getDrawable(mContext,mBackgroundRes);
-        else if (mBackgroundUri!=null)
-            return getDrawableFromUri(mContext,Uri.parse(mBackgroundUri));
-        else
-            return null;
     }
 
     public @ColorInt int getItemTextColor() {
         return mItemTextColor;
     }
 
+    @ColorInt
+    public int getHeaderTextColor() {
+        return mHeaderTextColor;
+    }
 
     @ColorInt int getTitleTextColor() {
         return mTitleTextColor;
@@ -174,18 +121,91 @@ public class BottomSheetColors implements Serializable {
         return mIconTintColor;
     }
 
-
-    private Drawable getDrawableFromUri(Context context,Uri uri) {
-        if (context==null)
-            throw new IllegalStateException("Call setContext after deserialization.");
-        Drawable newDrawable;
-        try {
-            InputStream inputStream = context.getContentResolver().openInputStream(uri);
-            newDrawable = Drawable.createFromStream(inputStream, uri.toString() );
-        } catch (FileNotFoundException e) {
-            newDrawable = null;
-        }
-        return newDrawable;
+    public @ColorInt int getBackgroundColor() {
+        return mBackgroundColor;
     }
 
+    public Drawable getDividerBackground(Context context) {
+        if (mDividerBackgroundUri!=null)
+            return BottomSheetBuilderUtils.getDrawableFromUri(context,mDividerBackgroundUri);
+        else if (mDividerBackgroundRes!=0)
+            return ContextCompat.getDrawable(context,mDividerBackgroundRes);
+        else if (mDividerBackgroundDrawable!=null)
+            return mDividerBackgroundDrawable;
+        else
+            return null;
+    }
+
+    public Drawable getItemBackground(Context context) {
+        if (mItemBackgroundUri!=null)
+            return BottomSheetBuilderUtils.getDrawableFromUri(context,mItemBackgroundUri);
+        else if (mItemBackgroundRes!=0)
+            return ContextCompat.getDrawable(context,mItemBackgroundRes);
+        if (mItemBackgroundDrawable!=null)
+            return mItemBackgroundDrawable;
+        else
+            return null;
+    }
+
+    public Drawable getBackground(Context context) {
+        if (mBackgroundUri !=null)
+            return BottomSheetBuilderUtils.getDrawableFromUri(context,mBackgroundUri);
+        else if (mBackgroundRes!=0)
+            return ContextCompat.getDrawable(context,mBackgroundRes);
+        if (mBackgroundDrawable!=null)
+            return mBackgroundDrawable;
+        else
+            return null;
+    }
+
+    @DrawableRes
+    public int getBackgroundRes() {
+        return mBackgroundRes;
+    }
+
+    @DrawableRes
+    public int getItemBackgroundRes() {
+        return mItemBackgroundRes;
+    }
+
+    @DrawableRes
+    public int getDividerBackgroundRes() {
+        return mDividerBackgroundRes;
+    }
+
+    public boolean hasBackgroundRes() {
+        return mBackgroundRes!=0;
+    }
+
+    public boolean hasItemBackgroundRes() {
+        return mItemBackgroundRes!=0;
+    }
+
+    public boolean hasDividerBackgroundRes() {
+        return mDividerBackgroundRes!=0;
+    }
+
+    public Uri getBackgroundUri() {
+        return mBackgroundUri;
+    }
+
+    public Uri getItemBackgroundUri() {
+        return mItemBackgroundUri;
+    }
+
+    public Uri getDividerBackgroundUri() {
+        return mDividerBackgroundUri;
+    }
+
+    public boolean hasBackgroundUri() {
+        return mBackgroundUri!=null;
+    }
+
+    public boolean hasItemBackgroundUri() {
+        return mItemBackgroundUri!=null;
+    }
+
+    public boolean hasDividerBackgroundUri() {
+        return mDividerBackgroundUri!=null;
+    }
 }

@@ -16,64 +16,61 @@
 
 package com.github.rubensousa.bottomsheetbuilder.adapter;
 
-import android.graphics.PorterDuff;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.MenuItem;
 
+import com.github.rubensousa.bottomsheetbuilder.menu.BottomSheetMenuItem;
 
-class BottomSheetMenuItem implements BottomSheetItem {
 
-    private int mTintColor;
+class BottomSheetListMenuItem implements BottomSheetItem {
+
+    private BottomSheetColors mColors;
     private Drawable mIcon;
-    private Drawable mTintedIcon;
+    private int mItemID;
     private String mTitle;
-    private int mId;
-    private MenuItem mMenuItem;
 
-    @ColorInt
-    private int mTextColor;
+    //WILL NOT HOLD REFERENCE TO BottomSheetMenuItem
 
-    private Drawable mBackground;
-
-    public BottomSheetMenuItem(MenuItem item, @ColorInt int textColor, Drawable background,
-                               int tintColor) {
-        mMenuItem = item;
-        mIcon = item.getIcon();
-        mId = item.getItemId();
-        mTitle = item.getTitle().toString();
-        mTextColor = textColor;
-        mBackground = background;
-        mTintColor = tintColor;
-
-        if (mTintColor != -1) {
-            mIcon = DrawableCompat.wrap(mIcon);
-            DrawableCompat.setTint(mIcon, mTintColor);
-        }
+    public BottomSheetListMenuItem(BottomSheetMenuItem item, BottomSheetColors colors) {
+        mColors=colors;
+        mIcon=item.getIcon();
+        mItemID=item.getItemId();
+        mTitle=item.getTitle();
     }
 
     public Drawable getIcon() {
+        if (mColors.getIconTintColor()!=-1) {
+            mIcon = DrawableCompat.wrap(mIcon);
+            DrawableCompat.setTint(mIcon, mColors.getIconTintColor());
+        }
         return mIcon;
     }
 
-    public MenuItem getMenuItem() {
-        return mMenuItem;
+    Drawable getBackground(Context context) {
+        return mColors.getBackground(context);
     }
 
-    Drawable getBackground() {
-        return mBackground;
+    public boolean hasBackgroundRes() {
+        return mColors.hasItemBackgroundRes();
+    }
+
+    @DrawableRes
+    public int getBackgroundRes() {
+        return mColors.getItemBackgroundRes();
     }
 
     public int getId() {
-        return mId;
+        return mItemID;
     }
 
     @ColorInt
     public int getTextColor() {
-        return mTextColor;
+        return mColors.getTitleTextColor();
     }
 
     @Override

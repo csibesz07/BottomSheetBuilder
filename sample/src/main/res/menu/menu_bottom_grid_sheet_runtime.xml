@@ -4,38 +4,38 @@
     <item
         android:icon="@drawable/ic_gmail_48dp"
         android:title="Gmail"
-        android:id="@+id/id_1"/>
+        android:id="@+id/id_gmail"/>
     <item
         android:icon="@drawable/ic_hangouts_48dp"
         android:title="Hangouts"
-        android:id="@+id/id_2"/>
+        android:id="@+id/id_hangouts"/>
     <item
         android:icon="@drawable/ic_google_48dp"
         android:title="Google+"
-        android:id="@+id/id_3"/>
+        android:id="@+id/id_google"/>
     <item
         android:icon="@drawable/ic_mail_48dp"
         android:title="Mail"
-        android:id="@+id/id_4"/>
+        android:id="@+id/id_mail"/>
 
     <item
         android:icon="@drawable/ic_message_48dp"
         android:title="Message"
-        android:id="@+id/id_5"/>
+        android:id="@+id/id_message"/>
 
     <item
         android:icon="@drawable/ic_content_copy_48dp"
         android:title="Copy"
-        android:id="@+id/id_6"/>
+        android:id="@+id/id_copy"/>
 
     <item
         android:icon="@drawable/ic_facebook_box"
         android:title="Facebook"
-        android:id="@+id/id_7"/>
+        android:id="@+id/id_facebook"/>
 
     <item
         android:icon="@drawable/ic_twitter_box"
         android:title="Twitter"
-        android:id="@+id/id_8"/>
+        android:id="@+id/id_twitter"/>
 
 </menu>
